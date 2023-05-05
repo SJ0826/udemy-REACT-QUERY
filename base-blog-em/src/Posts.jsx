@@ -1,6 +1,8 @@
 import { useState } from "react";
+import { useQuery } from "react-query"; // 서버에서 데이터를 가져올 때 사용하는 훅
 
 import { PostDetail } from "./PostDetail";
+
 const maxPostPage = 10;
 
 async function fetchPosts() {
@@ -15,7 +17,21 @@ export function Posts() {
   const [selectedPost, setSelectedPost] = useState(null);
 
   // replace with useQuery
-  const data = [];
+  const { data, isError, error, isLoading } = useQuery("posts", fetchPosts, {
+    staleTime: 2000,
+  }); // 인자 1: 쿼리 키, 인자 2: 쿼리 함수 (비동기)
+  if (isLoading) return <h3>Loading...</h3>;
+  // 리액트 쿼리는 기본적으로 세번 로딩 시도 후 안되면 에러라고 판단.
+  if (isError)
+    return (
+      <>
+        <h3>Oops, something went wrong</h3>
+        <p>{error.toString()}</p>
+      </>
+    );
+  // isFetching과 isLoading의 차이점
+  // isFetching: 비동기 쿼리가 해결되지 않았음
+  // isLoading: isFetching의 하위집합, 데이터를 가져오는 중, 표시할 캐시가 없음
 
   return (
     <>
